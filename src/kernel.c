@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "idt/idt.h"
 #include "io/io.h"
+#include "memory/heap/kheap.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0, terminal_col = 0;
@@ -55,7 +56,15 @@ void print(const char* str) {
 void kernel_main() {
   terminal_intialize();
   print("Hello world!\nI'm Atheer :)");
+  
+  kheap_init();
+  
   idt_init();
-  
-  
+  void* ptr = kmalloc(50);
+  void *ptr2 = kmalloc(5000);
+  kfree(ptr);
+  void* ptr3 = kmalloc(100);
+  if (ptr || ptr2 || ptr3) {
+
+  }
 }
