@@ -60,11 +60,6 @@ void kernel_main() {
   kheap_init();
   
   idt_init();
-  void* ptr = kmalloc(50);
-  void *ptr2 = kmalloc(5000);
-  kfree(ptr);
-  void* ptr3 = kmalloc(100);
-  if (ptr || ptr2 || ptr3) {
 
-  }
+  enable_interupts();
 }

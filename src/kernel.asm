@@ -33,7 +33,6 @@ _start:
 
     ; End remap of the master PIC
 
-    sti
     call kernel_main
     jmp $
 
