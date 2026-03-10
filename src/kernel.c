@@ -63,14 +63,13 @@ void kernel_main() {
   
   kheap_init();
   
+  disk_search_and_init();
+
   idt_init();
 
   kernel_4gb_chunck = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
   paging_swtich(paging_4gb_chunck_get_directory(kernel_4gb_chunck));
   enable_paging();
-
-  char buf[512];
-  disk_read_sector(0, 1, buf);
 
   enable_interrupts();
 }
