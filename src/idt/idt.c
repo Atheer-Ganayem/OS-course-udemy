@@ -4,7 +4,7 @@
 #include "kernel.h"
 #include "io/io.h"
 
-struct idt_desc idt_descriptors[PEACHOS_TOTAL_INTERUPTS];
+struct idt_desc idt_descriptors[PEACHOS_TOTAL_INTERRUPTS];
 struct idtr_desc idtr_descriptor;
 
 extern void idt_load(struct idtr_desc* ptr);
@@ -35,11 +35,11 @@ void idt_set(int interupt_no, void* addr) {
 }
 
 void idt_init() {
-  memset(idt_descriptors, 0, sizeof(PEACHOS_TOTAL_INTERUPTS));
+  memset(idt_descriptors, 0, sizeof(PEACHOS_TOTAL_INTERRUPTS));
   idtr_descriptor.limit = sizeof(idt_descriptors)-1;
   idtr_descriptor.base = (uint32_t) idt_descriptors;
 
-  for (int i = 0; i < PEACHOS_TOTAL_INTERUPTS; i++) {
+  for (int i = 0; i < PEACHOS_TOTAL_INTERRUPTS; i++) {
     idt_set(i, no_interrupt);
   }
 

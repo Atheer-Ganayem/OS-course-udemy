@@ -24,7 +24,7 @@ all: ./bin/boot.bin ./bin/kernel.bin
 	dd if=/dev/zero bs=512 count=100 >> ./bin/os.bin
 
 qemu:
-	qemu-system-x86_64 -hda ./bin/os.bin
+	qemu-system-i386 -hda ./bin/os.bin
 
 ./bin/kernel.bin: $(ALL_OBJS)
 	i686-elf-ld -g -relocatable $(ALL_OBJS) -o ./build/kernelfull.o

@@ -6,6 +6,8 @@
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
 #include "disk/disk.h"
+#include "string/string.h"
+#include "fs/pparser.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0, terminal_col = 0;
@@ -42,12 +44,6 @@ void terminal_intialize() {
   }
 }
 
-size_t strlen(const char* str) {
-  size_t len = 0;
-  while (*(str++)) len++;
-  return len;
-}
-
 void print(const char* str) {
   size_t len = strlen(str);
   for (int i = 0; i < len; i++) {
@@ -55,7 +51,7 @@ void print(const char* str) {
   }
 }
 
-static struct page_4gb_chunck* kernel_4gb_chunck = 0;
+static struct paging_4gb_chunk* kernel_4gb_chunk = 0;
 
 void kernel_main() {
   terminal_intialize();
@@ -67,9 +63,14 @@ void kernel_main() {
 
   idt_init();
 
-  kernel_4gb_chunck = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-  paging_swtich(paging_4gb_chunck_get_directory(kernel_4gb_chunck));
+  kernel_4gb_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+  paging_switch(paging_4gb_chunk_get_directory(kernel_4gb_chunk));
   enable_paging();
 
   enable_interrupts();
+  
+  struct path_root* root = pathparser_parse("0:/bin/shell.exe", NULL);
+  if (root) {
+    
+  }
 }

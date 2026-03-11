@@ -10,7 +10,7 @@ static int heap_validate_table(void*ptr, void* end, struct heap_table* table) {
   size_t total_blocks = table_size/PEACHOS_HEAP_BLOCK_SIZE;
 
   if (table->total != total_blocks) {
-    res = -ENVARG;
+    res = -EINVARG;
     goto out;
   }
   
@@ -26,7 +26,7 @@ int heap_create(struct heap* heap, void* ptr, void* end, struct heap_table* tabl
   int res = -EIO;
   
   if (!heap_validate_aligment(ptr) || !heap_validate_aligment(end)) {
-    res = -ENVARG;
+    res = -EINVARG;
     goto out;
   }
 

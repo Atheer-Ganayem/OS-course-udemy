@@ -6,7 +6,7 @@ extern void paging_load_directory(uint32_t* directory);
 
 static uint32_t* current_directory = 0;
 
-struct page_4gb_chunck* paging_new_4gb(uint8_t flags) {
+struct paging_4gb_chunk* paging_new_4gb(uint8_t flags) {
   uint32_t* directory = kzalloc(sizeof(uint32_t) * PAGING_TOTAL_ENTRIES_PER_TABLE);
   int offset = 0;
 
@@ -19,19 +19,19 @@ struct page_4gb_chunck* paging_new_4gb(uint8_t flags) {
     directory[i] = (uint32_t) entry | flags | PAGING_IS_WRITEABLE;
   }
 
-  struct page_4gb_chunck* chunck = kzalloc(sizeof(struct page_4gb_chunck));
-  chunck->directory_entry = directory;
+  struct paging_4gb_chunk* chunk = kzalloc(sizeof(struct paging_4gb_chunk));
+  chunk->directory_entry = directory;
 
-  return chunck;
+  return chunk;
 }
 
-void paging_swtich(uint32_t* directory) {
+void paging_switch(uint32_t* directory) {
   paging_load_directory(directory);
   current_directory = directory;
 }
 
-uint32_t* paging_4gb_chunck_get_directory(struct page_4gb_chunck* chunck) {
-  return chunck->directory_entry;
+uint32_t* paging_4gb_chunk_get_directory(struct paging_4gb_chunk* chunk) {
+  return chunk->directory_entry;
 }
 
 bool paging_is_aligned(void* addr) {
@@ -41,7 +41,7 @@ bool paging_is_aligned(void* addr) {
 int paging_get_indexes(void* virual_address, uint32_t* directory_index_out, uint32_t* table_index_out) {
   int res = 0;
   if (!paging_is_aligned(virual_address)) {
-    res = -ENVARG;
+    res = -EINVARG;
     goto out;
   }
 
@@ -54,7 +54,7 @@ int paging_get_indexes(void* virual_address, uint32_t* directory_index_out, uint
 
 int paging_set(uint32_t* directory, void* virt, uint32_t val) {
   if (!paging_is_aligned(virt)) {
-    return -ENVARG;
+    return -EINVARG;
   }
 
   uint32_t dir_index = 0, page_index = 0;
