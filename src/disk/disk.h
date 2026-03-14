@@ -13,7 +13,12 @@ struct disk
   PEACHOS_DISK_TYPE type;
   int sector_size;
 
+  int id;
+
   struct filesystem* filesystem;
+
+  // the private data of our disk
+  void* fs_private;
 };
 
 
