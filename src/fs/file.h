@@ -13,7 +13,7 @@ enum {
 typedef unsigned int FILE_MODE;
 enum {
   FILE_MODE_READ,
-  FLE_MODE_WRITE,
+  FILE_MODE_WRITE,
   FILE_MODE_APPEND,
   FILE_MODE_INVALID
 };
@@ -44,7 +44,7 @@ struct file_descriptor {
 
 
 void fs_init();
-int fopen(const char* filename, const char* mode);
+int fopen(const char* filename, const char* mode_str);
 void fs_insert_filesystem(struct filesystem* filesystem);
 struct filesystem* fs_resolve(struct disk* disk);
 
