@@ -71,5 +71,8 @@ void kernel_main() {
 
   enable_interrupts();
 
-
+  int fd = fopen("0:/hello.txt", "r");
+  if (fd) {
+    print("We oppened hello.txt\n");
+  }
 }
