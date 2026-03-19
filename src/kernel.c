@@ -73,6 +73,9 @@ void kernel_main() {
 
   int fd = fopen("0:/hello.txt", "r");
   if (fd) {
-    print("We oppened hello.txt\n");
+    print("\nWe oppened hello.txt\n");
+    char buf[4096] = {0};
+    fread(buf, sizeof(buf)-1, 1, fd);
+    print(buf);
   }
 }

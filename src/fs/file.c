@@ -128,7 +128,7 @@ int fopen(const char *filename, const char* mode_str) {
     goto out;
   }
 
-  FILE_MODE mode =file_get_mode_by_string(mode_str);
+  FILE_MODE mode = file_get_mode_by_string(mode_str);
   if (mode == FILE_MODE_INVALID) {
     res = -EINVARG;
     goto out;
@@ -156,5 +156,25 @@ out:
     res = 0;
   }
 
+  return res;
+}
+
+int fread(void* ptr, uint32_t size, uint32_t nmemb, int fd) {
+  int res = 0;
+  
+  if (!size || !nmemb || fd < 1) {
+    res = -EINVARG;
+    goto out;
+  }
+
+  struct file_descriptor* desc = file_get_descriptor(fd);
+  if (!desc) {
+    res = -EINVARG;
+    goto out;
+  }
+
+  res = desc->filesystem->read(desc->disk, desc->private, size, nmemb, (char*)ptr);
+  
+out:
   return res;
 }
