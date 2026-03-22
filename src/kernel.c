@@ -75,6 +75,7 @@ void kernel_main() {
   if (fd) {
     print("\nWe oppened hello.txt\n");
     char buf[4096] = {0};
+    fseek(fd, 4, SEEK_SET);
     fread(buf, sizeof(buf)-1, 1, fd);
     print(buf);
   }
