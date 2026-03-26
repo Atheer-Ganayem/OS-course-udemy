@@ -5,6 +5,7 @@
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
 void print(const char* str);
+void panic(const char* msg);
 void kernel_main();
 
 #define ERROR(value) (void*)(value)
