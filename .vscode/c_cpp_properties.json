@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/atheer/opt/cross/lib/gcc/i686-elf/10.2.0/include"
+            ],
+            "defines": [],
+            "compilerPath": "/home/atheer/opt/cross/bin/i686-elf-gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": [
+                "-m32",
+                "-ffreestanding"
+            ]
+        }
+    ],
+    "version": 4
+}
