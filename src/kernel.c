@@ -69,14 +69,14 @@ struct gdt_structured gdt_structured[PEACHOS_TOTAL_GDT_SEGMENTS] = {
   {.base = 0x00, .limit = 0x00, .type = 0x00},                  // NULL segment
   {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x9A},            // Kernel code segment
   {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0x92},            // Kernel data segment
-  {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF8},            // User data segment
+  {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF8},            // User code segment
   {.base = 0x00, .limit = 0xFFFFFFFF, .type = 0xF2},            // User data segment
   {.base = (uint32_t)(&tss), .limit = sizeof(tss), .type = 0xE9}, // TSS segment
 };
 
 void kernel_main() {
   terminal_intialize();
-  print("Hello world!\nI'm Atheer :)");
+  print("Hello world!\nI'm Atheer :)\n");
 
   memset(gdt_real, 0x00, sizeof(gdt_real));
   gdt_structured_to_gdt(gdt_real, gdt_structured, PEACHOS_TOTAL_GDT_SEGMENTS);
@@ -104,9 +104,24 @@ void kernel_main() {
 
   int fd = fopen("0:/hello.txt", "r");
   if (fd) {
-    struct file_stat s;
-    fstat(fd, &s);
-    fclose(fd);
+    struct file_stat s; 
+    int res = fstat(fd, &s);
+    if (res) {
+      panic("ERR: fstat");
+    }
+    void* buf = kzalloc(s.file_size+1);
+    if (!buf) {
+      panic("ERR: allocating buf");
+    }
+    res = fread(buf, s.file_size, 1, fd);
+    if (res != 1) {
+      panic("ERR: fread");
+    }
+    print(buf);
+    res = fclose(fd);
+    if (res) {
+      panic("ERR: fclose");
+    }
     print("\nfile closed\n");
   }
 }
