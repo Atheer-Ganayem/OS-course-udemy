@@ -5,6 +5,7 @@
 #include "config.h"
 #include "memory/heap/kheap.h"
 #include "kernel.h"
+#include "process.h"
 
 struct task* current_task = NULL;
 struct task* task_tail = NULL;
@@ -51,7 +52,7 @@ int task_free(struct task* task) {
   return 0;
 }
 
-int task_init(struct task* task) {
+int task_init(struct task* task, struct process* proc) {
   memset(task, 0x00, sizeof(task));
   task->page_directory = paging_new_4gb(PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
   if (task->page_directory == NULL) {
@@ -61,11 +62,12 @@ int task_init(struct task* task) {
   task->registers.ip = PEACHOS_PROGRAM_VIRTUAL_ADDRESS;
   task->registers.ss = USER_DATA_SEGMENT;
   task->registers.esp = PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
+  task->process = proc;
 
   return 0;
 }
 
-struct task* task_new() {
+struct task* task_new(struct process* proc) {
   int res = 0;
 
   struct task* task = kzalloc(sizeof(task));
@@ -74,7 +76,7 @@ struct task* task_new() {
     goto out;
   }
 
-  res = task_init(task);
+  res = task_init(task, proc);
   if (res != PEACHOS_ALL_OK) {
     goto out;
   }

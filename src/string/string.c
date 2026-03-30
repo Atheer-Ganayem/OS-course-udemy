@@ -25,7 +25,7 @@ int strnlen(const char* ptr, int max) {
   return i;
 }
 
-char* strcpy(char* dest, char* src) {
+char* strcpy(char* dest, const char* src) {
   char* res = dest;
   while(*src) {
     *dest = *src;
@@ -35,6 +35,20 @@ char* strcpy(char* dest, char* src) {
   *dest = 0x00;
 
   return res;
+}
+
+char* strncpy(char* dest, const char* src, int count) {
+  int i = 0;
+  for (; i < count-1; i++) {
+    if (src[i] == 0x00) {
+      break;
+    }
+    dest[i] = src[i];
+  }
+
+  dest[i] = 0x00;
+
+  return dest;
 }
 
 int istrncmp(const char* str1, const char *str2, int n) {
