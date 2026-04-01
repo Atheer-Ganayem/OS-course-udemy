@@ -19,8 +19,8 @@ struct process {
 
   // The size of data pointed to by "ptr";
   uint32_t size;
-
-  
 };
+
+int process_load(const char* filename, struct process** process);
 
 #endif

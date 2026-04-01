@@ -12,6 +12,8 @@
 #include "config.h"
 #include "memory/memory.h"
 #include "task/tss.h"
+#include "task/process.h"
+#include "status.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0, terminal_col = 0;
@@ -74,6 +76,8 @@ struct gdt_structured gdt_structured[PEACHOS_TOTAL_GDT_SEGMENTS] = {
   {.base = (uint32_t)(&tss), .limit = sizeof(tss), .type = 0xE9}, // TSS segment
 };
 
+void test_file();
+
 void kernel_main() {
   terminal_intialize();
   print("Hello world!\nI'm Atheer :)\n");
@@ -100,8 +104,20 @@ void kernel_main() {
   paging_switch(paging_4gb_chunk_get_directory(kernel_4gb_chunk));
   enable_paging();
 
-  enable_interrupts();
+  struct process* proc = NULL;
+  int res = process_load("0:/blank.bin", &proc);
+  if (res != PEACHOS_ALL_OK) {
+    panic("Failed to load blank.bin\n");
+  }
 
+  task_run_first_ever_task();
+
+  // enable_interrupts();
+
+  while(1){}
+}
+
+void test_file() {
   int fd = fopen("0:/hello.txt", "r");
   if (fd) {
     struct file_stat s; 

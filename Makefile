@@ -17,13 +17,14 @@ ALL_OBJS := ./build/kernel.asm.o $(C_OBJS) $(ASM_OBJS)
 
 .PHONY: all clean qemu
 
-all: ./bin/boot.bin ./bin/kernel.bin
+all: ./bin/boot.bin ./bin/kernel.bin user_programs
 	rm -rf ./bin/os.bin
 	dd if=./bin/boot.bin >> ./bin/os.bin
 	dd if=./bin/kernel.bin >> ./bin/os.bin
 	dd if=/dev/zero bs=1048576 count=16 >> ./bin/os.bin
 	sudo mount -t vfat ./bin/os.bin /mnt/d
 	sudo cp ./hello.txt /mnt/d
+	sudo cp ./programs/blank/blank.bin /mnt/d
 	sudo umount /mnt/d
 
 qemu:
@@ -51,6 +52,12 @@ qemu:
 	@mkdir -p $(dir $@)
 	nasm -f elf -g $< -o $@
 
-clean:
+user_programs:
+	cd ./programs/blank && $(MAKE) all
+
+user_programs_clean:
+	cd ./programs/blank && $(MAKE) clean
+
+clean: user_programs_clean
 	rm -rf ./bin/boot.bin ./bin/kernel.bin ./bin/os.bin
 	rm -rf ./build

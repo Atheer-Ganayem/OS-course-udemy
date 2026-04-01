@@ -96,7 +96,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
   struct process* proc;
   void* program_stack_ptr = NULL;
 
-  if (process_get(process_slot) == NULL) {
+  if (process_get(process_slot) != NULL) {
     res = -EISTKN;
     goto out;
   }
@@ -127,6 +127,7 @@ int process_load_for_slot(const char* filename, struct process** process, int pr
   task = task_new(proc);
   if (ERROR_I(task) == 0) {
     res = ERROR_I(task);
+    goto out;
   }
 
   proc-> task = task;
