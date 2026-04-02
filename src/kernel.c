@@ -101,7 +101,7 @@ void kernel_main() {
   tss_load(0x28);
 
   kernel_4gb_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
-  paging_switch(paging_4gb_chunk_get_directory(kernel_4gb_chunk));
+  paging_switch(kernel_4gb_chunk);
   enable_paging();
 
   struct process* proc = NULL;

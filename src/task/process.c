@@ -77,9 +77,9 @@ static int process_load_data(const char* filename, struct process* proc) {
 int process_map_binary(struct process* proc) {
   int res = 0;
 
-  uint32_t* dir_entry = proc->task->page_directory->directory_entry;
+  struct paging_4gb_chunk* dir = proc->task->page_directory;
   int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE;
-  paging_map_to(dir_entry, (void*) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, proc->ptr, paging_align_address(proc->ptr + proc->size), flags);
+  paging_map_to(dir, (void*) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, proc->ptr, paging_align_address(proc->ptr + proc->size), flags);
 
   return res;
 }
