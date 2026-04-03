@@ -5,6 +5,8 @@
 #include "memory/paging/paging.h"
 #include "stdint.h"
 
+struct interupt_frame;
+
 struct registers {
   uint32_t edi;
   uint32_t esi;
@@ -45,5 +47,7 @@ void task_run_first_ever_task();
 void task_return(struct registers* regs);
 void restore_general_purpose_registers(struct registers* regs);
 void user_registers();
+
+void task_current_save_state(struct interupt_frame* frame);
 
 #endif
