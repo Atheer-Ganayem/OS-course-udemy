@@ -2,7 +2,7 @@
 
 global _start
 extern kernel_main
-global kernel_regsiters
+global kernel_registers
 
 CODE_SEG equ 0x08
 DATA_SEG equ 0x10
@@ -37,7 +37,7 @@ _start:
 
     jmp $
 
-kernel_regsiters:
+kernel_registers:
     mov ax, 10
     mov ds, ax
     mov es, ax

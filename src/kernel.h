@@ -6,8 +6,8 @@
 #define VGA_HEIGHT 20
 void print(const char* str);
 void panic(const char* msg);
-void kernel_page();
 void kernel_registers();
+void kernel_page();
 void kernel_main();
 
 #define ERROR(value) (void*)(value)
