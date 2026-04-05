@@ -2,6 +2,7 @@
 #include "stdint.h"
 #include <stddef.h>
 #include "idt/idt.h"
+#include "isr80h/isr80h.h"
 #include "io/io.h"
 #include "memory/heap/kheap.h"
 #include "memory/paging/paging.h"
@@ -108,6 +109,8 @@ void kernel_main() {
   kernel_4gb_chunk = paging_new_4gb(PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
   paging_switch(kernel_4gb_chunk);
   enable_paging();
+
+  isr80h_register_commands();
 
   struct process* proc = NULL;
   int res = process_load("0:/blank.bin", &proc);
