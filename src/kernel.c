@@ -86,7 +86,7 @@ void test_file();
 
 void kernel_main() {
   terminal_intialize();
-  print("Hello world!\nI'm Atheer :)\n");
+  // print("Hello world!\nI'm Atheer :)\n");
 
   memset(gdt_real, 0x00, sizeof(gdt_real));
   gdt_structured_to_gdt(gdt_real, gdt_structured, PEACHOS_TOTAL_GDT_SEGMENTS);
