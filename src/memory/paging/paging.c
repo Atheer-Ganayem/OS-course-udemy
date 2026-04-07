@@ -1,6 +1,7 @@
 #include "paging.h"
 #include "memory/heap/kheap.h"
 #include "status.h"
+#include "kernel.h"
 
 extern void paging_load_directory(uint32_t* directory);
 
@@ -65,7 +66,7 @@ int paging_get_indexes(void* virual_address, uint32_t* directory_index_out, uint
 }
 
 int paging_map(struct paging_4gb_chunk* dir, void* virt, void* phys, int flags) {
-  if ((unsigned int)virt & PAGING_PAGE_SIZE || (unsigned int)phys % PAGING_PAGE_SIZE) {
+  if ((uint32_t)virt % PAGING_PAGE_SIZE || (uint32_t)phys % PAGING_PAGE_SIZE) {
     return -EINVARG;
   }
 
@@ -77,7 +78,7 @@ int paging_map_range(struct paging_4gb_chunk* dir, void* virt, void* phys, int c
 
   for (int i = 0; i < count; i++) {
     res = paging_map(dir, virt, phys, flags);
-    if (res == 0) {
+    if (ISERR(res)) {
       break;
     }
     virt += PAGING_PAGE_SIZE;
@@ -121,8 +122,20 @@ int paging_set(uint32_t* directory, void* virt, uint32_t val) {
   }
 
   uint32_t entry = directory[dir_index];
-  uint32_t* table = (uint32_t*)(entry& 0xfffff000);
+  uint32_t* table = (uint32_t*)(entry & 0xfffff000);
   table[page_index] = val;
 
   return 0;
+}
+
+uint32_t paging_get(uint32_t* dir, void* virt) {
+  uint32_t dir_index = 0;
+  uint32_t table_index = 0;
+
+  // int res = paging_get_indexes(virt, &dir_index, &table_index);
+  paging_get_indexes(virt, &dir_index, &table_index);
+  uint32_t entry = dir[dir_index];
+  uint32_t* table = (uint32_t*)(entry & 0xfffff000);
+
+  return table[table_index];
 }

@@ -86,6 +86,15 @@ int process_map_binary(struct process* proc) {
 
 int process_map_memory(struct process* proc) {
   int res = process_map_binary(proc);
+
+  if (ISERR(res)) {
+    goto out;
+  }
+
+  int flags = PAGING_IS_PRESENT | PAGING_IS_WRITEABLE | PAGING_ACCESS_FROM_ALL;
+  res = paging_map_to(proc->task->page_directory, (void*)PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, proc->stack, paging_align_address(proc->stack + PEACHOS_USER_PROGRAM_STACK_SIZE), flags);
+
+out:
   return res;
 }
 
