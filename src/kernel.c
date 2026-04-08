@@ -15,6 +15,7 @@
 #include "task/tss.h"
 #include "task/process.h"
 #include "status.h"
+#include "keyboard/keyboard.h"
 
 uint16_t* video_mem = 0;
 uint16_t terminal_row = 0, terminal_col = 0;
@@ -111,6 +112,10 @@ void kernel_main() {
   enable_paging();
 
   isr80h_register_commands();
+
+  keyboard_init();
+
+  // initializaion finished
 
   struct process* proc = NULL;
   int res = process_load("0:/blank.bin", &proc);
