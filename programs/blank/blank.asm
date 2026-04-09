@@ -19,4 +19,4 @@ _start:
   jmp $
 
 section .data
-message: db `Hello world from user app!`, 0
+message: db `Hello world from user app!`, 0x0a, 0, 

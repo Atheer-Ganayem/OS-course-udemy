@@ -4,6 +4,7 @@
 
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 20
+void terminal_write_char(char c, char color);
 void print(const char* str);
 void panic(const char* msg);
 void kernel_registers();

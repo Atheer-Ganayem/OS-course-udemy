@@ -26,6 +26,11 @@ struct process* process_get(int proc_id) {
   return processes[proc_id];
 }
 
+int process_switch(struct process* proc) {
+  current_process = proc;
+  return PEACHOS_ALL_OK;
+}
+
 static int process_load_binary(const char* filename, struct process* proc) {
   int res = 0;
 
@@ -182,5 +187,13 @@ int process_load(const char* filename, struct process** process) {
   res = process_load_for_slot(filename, process, process_slot);
 
 out:
+  return res;
+}
+
+int process_load_switch(const char* filename, struct process** proc) {
+  int res = process_load(filename, proc);
+  if (res == PEACHOS_ALL_OK) {
+    process_switch(*proc);
+  }
   return res;
 }

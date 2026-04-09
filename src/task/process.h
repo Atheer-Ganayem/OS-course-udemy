@@ -28,7 +28,9 @@ struct process {
   } keyboard;
 };
 
-int process_load(const char* filename, struct process** process);
 struct process* process_current();
+int process_load(const char* filename, struct process** process);
+int process_load_switch(const char* filename, struct process** proc);
+int process_switch(struct process* proc);
 
 #endif
