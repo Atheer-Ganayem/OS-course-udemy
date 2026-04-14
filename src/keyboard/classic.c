@@ -51,7 +51,7 @@ void classic_keyboard_handle_interupt() {
   kernel_page();
   uint8_t scancode = 0;
   scancode = insb(PS2_INPUT_PORT);
-  insb(PS2_INPUT_PORT);
+  // insb(PS2_INPUT_PORT);
 
   if (scancode & CLASSIC_KEYBOARD_KEY_RELEASED) {
     return;

@@ -4,7 +4,8 @@
 
 enum SystemCommands {
   SYSTEM_COMMAND0_SUM,
-  SYSTEM_COMMAND1_PRINT
+  SYSTEM_COMMAND1_PRINT,
+  SYSTEM_COMMAND1_GETKEY
 };
 
 void isr80h_register_commands();

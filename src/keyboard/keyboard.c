@@ -44,6 +44,8 @@ void keyboard_backspace(struct process* proc) {
 } 
 
 void keyboard_push(char c) {
+  if (!c) return;
+
   struct process* proc = process_current();
   if (!proc) {
     return;
