@@ -23,3 +23,10 @@ void* isr80h_command2_getkey(struct interupt_frame* frame) {
   char c = keyboard_pop();
   return (void*)(int)c;
 }
+
+void* isr80h_command3_putchar(struct interupt_frame* frame) {
+  char c = (char)(int)task_get_stack_item(task_current(), 0);
+  terminal_write_char(c, 15);
+  
+  return 0;
+}
