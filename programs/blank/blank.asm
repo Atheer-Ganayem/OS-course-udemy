@@ -7,7 +7,6 @@ global _start
 _start:
   call keyboard_test
 
-
 keyboard_test:
   call getkey
   push eax
@@ -16,7 +15,7 @@ keyboard_test:
   add esp, 4
 
   cmp eax, 0x00
-  je main
+  je keyboard_test
 
   call print_err
 
