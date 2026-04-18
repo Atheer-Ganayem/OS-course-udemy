@@ -137,9 +137,9 @@ void kernel_main() {
   // initializaion finished
 
   struct process* proc = NULL;
-  int res = process_load_switch("0:/blank.bin", &proc);
+  int res = process_load_switch("0:/blank.elf", &proc);
   if (res != PEACHOS_ALL_OK) {
-    panic("Failed to load blank.bin\n");
+    panic("Failed to load blank.elf\n");
   }
 
   task_run_first_ever_task();

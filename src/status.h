@@ -10,5 +10,7 @@
 #define ERDONLY 6
 #define EUNIMP 7
 #define EISTKN 8
+#define EINVELFTYPE 9
+#define EINFORMAT 10
 
 #endif

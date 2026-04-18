@@ -5,16 +5,24 @@
 #include "config.h"
 #include "task.h"
 
+typedef unsigned char PROCESS_FILE_TYPE;
+#define PROCESS_FILE_TYPE_ELF 0
+#define PROCESS_FILE_TYPE_BIN 1
 
 struct process {
   uint16_t id;
   char filename[PEACHOS_MAX_PATH];
+  PROCESS_FILE_TYPE filetype;
 
   struct task* task;
   void* allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
 
-  // The phisical pointer to the process memory.
-  void* ptr;
+  union {
+    // The phisical pointer to the process memory.
+    void* ptr;
+    struct elf_file* elf_file;
+  };
+
   // The phisical pointer to the stack
   void* stack;
 

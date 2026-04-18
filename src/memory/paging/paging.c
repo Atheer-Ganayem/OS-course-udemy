@@ -139,3 +139,18 @@ uint32_t paging_get(uint32_t* dir, void* virt) {
 
   return table[table_index];
 }
+
+void* paging_align_address(void* ptr) {
+  if ((uint32_t)ptr % PAGING_PAGE_SIZE) {
+    return (void*)((uint32_t)ptr + PAGING_PAGE_SIZE - ((uint32_t)ptr % PAGING_PAGE_SIZE));
+  }
+  return ptr;
+}
+
+void* paging_align_to_lower_page(void* addr) {
+  uint32_t _addr = (uint32_t)addr;
+  if (_addr % PAGING_PAGE_SIZE) {
+    return (void*)(_addr - _addr%PAGING_PAGE_SIZE);
+  } 
+  return addr;
+} 

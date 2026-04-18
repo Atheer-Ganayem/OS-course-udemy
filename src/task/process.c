@@ -6,6 +6,7 @@
 #include "fs/file.h"
 #include "string/string.h"
 #include "memory/paging/paging.h"
+#include "loader/formats/elfloader.h"
 
 struct process* current_process = NULL;
 static struct process* processes[PEACHOS_MAX_PROCESSES] = {};
@@ -59,23 +60,36 @@ static int process_load_binary(const char* filename, struct process* proc) {
 
   proc->ptr = program_data_ptr;
   proc->size = stat.file_size;
+  proc->filetype = PROCESS_FILE_TYPE_BIN;
   
 out:
   fclose(fd);
   return res;
 }
 
-void* paging_align_address(void* ptr) {
-  if ((uint32_t)ptr % PAGING_PAGE_SIZE) {
-    return (void*)((uint32_t)ptr + PAGING_PAGE_SIZE - ((uint32_t)ptr % PAGING_PAGE_SIZE));
+static int process_load_elf(const char* filename, struct process* proc) {
+  int res = 0;
+
+  struct elf_file* file = NULL;
+
+  res = elf_load(filename, &file);
+  if (ISERR(res)) {
+    return res;
   }
-  return ptr;
+
+  proc->filetype = PROCESS_FILE_TYPE_ELF;
+  proc->elf_file = file;
+
+  return res;
 }
 
 static int process_load_data(const char* filename, struct process* proc) {
   int res = 0;
+  res = process_load_elf(filename, proc);
+  if (res == -EINFORMAT) {
+    res = process_load_binary(filename, proc);
+  }
 
-  res = process_load_binary(filename, proc);
   return res;
 }
 
@@ -84,7 +98,34 @@ int process_map_binary(struct process* proc) {
 
   struct paging_4gb_chunk* dir = proc->task->page_directory;
   int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL | PAGING_IS_WRITEABLE;
-  paging_map_to(dir, (void*) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, proc->ptr, paging_align_address(proc->ptr + proc->size), flags);
+  res = paging_map_to(dir, (void*) PEACHOS_PROGRAM_VIRTUAL_ADDRESS, proc->ptr, paging_align_address(proc->ptr + proc->size), flags);
+
+  return res;
+}
+
+static int process_map_elf(struct process* proc) {
+  int res = 0;
+
+  struct paging_4gb_chunk* dir = proc->task->page_directory;
+  struct elf_file* file = proc->elf_file;
+  struct elf_header* header = elf_header(file);
+  struct elf32_phdr* phdrs = elf_pheader(header);
+
+  for (int i = 0; i < header->e_phnum; i++) {
+    struct elf32_phdr* phdr = &phdrs[i];
+    void* phdr_phys_addr = elf_phdr_phys_address(file, phdr);
+    int flags = PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL;
+    if (phdr->p_flags & PF_W) {
+      flags |= PAGING_IS_WRITEABLE;
+    }
+    void* base_virt_addr = paging_align_to_lower_page((void*)phdr->p_vaddr);
+    void* base_phys_addr = paging_align_to_lower_page(phdr_phys_addr);
+    res = paging_map_to(dir, base_virt_addr, base_phys_addr, paging_align_address(phdr_phys_addr+phdr->p_filesz), flags);
+    if (ISERR(res)) {
+      break;
+    }
+  }
+
 
   return res;
 }
@@ -92,14 +133,25 @@ int process_map_binary(struct process* proc) {
 int process_map_memory(struct process* proc) {
   int res = process_map_binary(proc);
 
-  if (ISERR(res)) {
-    goto out;
+  switch (proc->filetype) {
+    case PROCESS_FILE_TYPE_ELF:
+      res = process_map_elf(proc);
+      break;
+    case PROCESS_FILE_TYPE_BIN:
+      res = process_map_binary(proc);
+      break;
+    default:
+      panic("process_map_memory: Invalid PROCESS_FILE_TYPE.\n");
   }
 
+  if (ISERR(res)) {
+    return res;
+  }
+
+  // map the stack
   int flags = PAGING_IS_PRESENT | PAGING_IS_WRITEABLE | PAGING_ACCESS_FROM_ALL;
   res = paging_map_to(proc->task->page_directory, (void*)PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_END, proc->stack, paging_align_address(proc->stack + PEACHOS_USER_PROGRAM_STACK_SIZE), flags);
 
-out:
   return res;
 }
 

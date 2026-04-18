@@ -9,6 +9,7 @@
 #include "idt/idt.h"
 #include "memory/paging/paging.h"
 #include "string/string.h"
+#include "loader/formats/elfloader.h"
 
 struct task* current_task = NULL;
 struct task* task_tail = NULL;
@@ -150,6 +151,9 @@ int task_init(struct task* task, struct process* proc) {
   }
 
   task->registers.ip = PEACHOS_PROGRAM_VIRTUAL_ADDRESS;
+  if (proc->filetype == PROCESS_FILE_TYPE_ELF) {
+    task->registers.ip = elf_header(proc->elf_file)->e_entry;
+  }
   task->registers.ss = USER_DATA_SEGMENT;
   task->registers.cs = USER_CODE_SEGMENT;
   task->registers.esp = PEACHOS_PROGRAM_VIRTUAL_STACK_ADDRESS_START;
