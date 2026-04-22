@@ -32,6 +32,35 @@ int process_switch(struct process* proc) {
   return PEACHOS_ALL_OK;
 }
 
+void* process_malloc(struct process* proc, size_t size) {
+  void* ptr = kzalloc(size);
+  if (!ptr) {
+    return 0;
+  }
+
+  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    if (proc->allocations[i] == NULL) {
+      proc->allocations[i] = ptr;
+      return ptr;
+    }
+  }
+
+  kfree(ptr);
+  return 0;
+}
+
+void* process_free(struct process* proc, void* ptr) {
+  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    if (proc->allocations[i] == ptr) {
+      proc->allocations[i] = NULL;
+      kfree(ptr);
+      break;
+    }
+  }
+
+  return 0;
+}
+
 static int process_load_binary(const char* filename, struct process* proc) {
   int res = 0;
 
@@ -120,7 +149,7 @@ static int process_map_elf(struct process* proc) {
     }
     void* base_virt_addr = paging_align_to_lower_page((void*)phdr->p_vaddr);
     void* base_phys_addr = paging_align_to_lower_page(phdr_phys_addr);
-    res = paging_map_to(dir, base_virt_addr, base_phys_addr, paging_align_address(phdr_phys_addr+phdr->p_filesz), flags);
+    res = paging_map_to(dir, base_virt_addr, base_phys_addr, paging_align_address(phdr_phys_addr+phdr->p_memsz), flags);
     if (ISERR(res)) {
       break;
     }
