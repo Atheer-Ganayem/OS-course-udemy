@@ -45,7 +45,7 @@ qemu:
 # Compile all other C files
 ./build/%.o: ./src/%.c
 	@mkdir -p $(dir $@)
-	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu99 -c $< -o $@
+	i686-elf-gcc $(INCLUDES) $(FLAGS) -std=gnu11 -c $< -o $@
 
 
 ./build/%.asm.o: ./src/%.asm
