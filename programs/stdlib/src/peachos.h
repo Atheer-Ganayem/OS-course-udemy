@@ -10,8 +10,11 @@ void peachos_putchar(char c);
 void* peachos_malloc(size_t size);
 void peachos_free(void* ptr);
 
+
 int peachos_getkey_block();
 
 void peachos_terminal_readline(char* out, size_t max, bool output_while_typing);
+
+void peachos_process_load_start(const char* filename);
 
 #endif
