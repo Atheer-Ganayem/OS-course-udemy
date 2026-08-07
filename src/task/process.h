@@ -9,13 +9,18 @@ typedef unsigned char PROCESS_FILE_TYPE;
 #define PROCESS_FILE_TYPE_ELF 0
 #define PROCESS_FILE_TYPE_BIN 1
 
+struct process_allocation {
+  void* ptr;
+  size_t size;
+};
+
 struct process {
   uint16_t id;
   char filename[PEACHOS_MAX_PATH];
   PROCESS_FILE_TYPE filetype;
 
   struct task* task;
-  void* allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
+  struct process_allocation allocations[PEACHOS_MAX_PROGRAM_ALLOCATIONS];
 
   union {
     // The phisical pointer to the process memory.
@@ -41,6 +46,6 @@ int process_load(const char* filename, struct process** process);
 int process_load_switch(const char* filename, struct process** proc);
 int process_switch(struct process* proc);
 void* process_malloc(struct process* proc, size_t size);
-void* process_free(struct process* proc, void* ptr);
+void process_free(struct process* proc, void* ptr);
 
 #endif

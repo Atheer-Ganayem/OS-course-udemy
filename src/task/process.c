@@ -32,33 +32,65 @@ int process_switch(struct process* proc) {
   return PEACHOS_ALL_OK;
 }
 
-void* process_malloc(struct process* proc, size_t size) {
-  void* ptr = kzalloc(size);
-  if (!ptr) {
-    return 0;
-  }
-
-  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
-    if (proc->allocations[i] == NULL) {
-      proc->allocations[i] = ptr;
-      return ptr;
-    }
-  }
-
-  kfree(ptr);
-  return 0;
-}
-
-void* process_free(struct process* proc, void* ptr) {
-  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
-    if (proc->allocations[i] == ptr) {
-      proc->allocations[i] = NULL;
-      kfree(ptr);
+int process_find_free_allocation_index(struct process* proc) {
+  int res = -ENOMEM;
+    for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    if (proc->allocations[i].ptr == NULL) {
+      res = i;
       break;
     }
   }
 
-  return 0;
+  return res;
+}
+
+void* process_malloc(struct process* proc, size_t size) {
+  void* ptr = kzalloc(size);
+  if (!ptr) {
+    goto out_err;
+  }
+
+  int index = process_find_free_allocation_index(proc);
+  if (index < 0) {
+    goto out_err;
+  }
+
+  int res = paging_map_to(proc->task->page_directory, ptr, ptr, paging_align_address(ptr+size), PAGING_IS_WRITEABLE | PAGING_IS_PRESENT | PAGING_ACCESS_FROM_ALL);
+  if (ISERR(res)) {
+    goto out_err;
+  }
+
+  proc->allocations[index].ptr = ptr;
+  proc->allocations[index].size = size;
+  return ptr;
+
+out_err:
+  kfree(ptr);
+  return NULL;
+}
+
+static struct process_allocation* process_get_allocations_by_addr(struct process* proc, void* addr) {
+  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    if (proc->allocations[i].ptr == addr) {
+      return &proc->allocations[i];
+    }
+  }
+
+  return NULL;
+}
+
+void process_free(struct process* proc, void* ptr) {
+  for (int i = 0; i < PEACHOS_MAX_PROGRAM_ALLOCATIONS; i++) {
+    if (proc->allocations[i].ptr == ptr) {
+      int res = paging_map_to(proc->task->page_directory, ptr, ptr, paging_align_address(ptr+proc->allocations[i].size), 0x00);
+      if (ISERR(res)) {
+        return;
+      }
+      proc->allocations[i].ptr = NULL;
+      kfree(ptr);
+      break;
+    }
+  }
 }
 
 static int process_load_binary(const char* filename, struct process* proc) {
