@@ -4,15 +4,11 @@
 #include "string.h"
 
 int main(int argc, char** argv) {
-  print("\nHello from blank\n");
-
-  char* ptr = malloc(20);
-  strcpy(ptr, "Hello world!");
-  print(ptr);
-  free(ptr);
-
-  ptr[0] = 'T';
-  print(ptr);
+  printf("argc: %i\n", argc);
+  for (int i = 0; i < argc; i++) {
+    print(argv[i]);
+    putchar('\n');
+  }
 
   while(1){
   }

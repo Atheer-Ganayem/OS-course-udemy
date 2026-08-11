@@ -153,4 +153,10 @@ void* paging_align_to_lower_page(void* addr) {
     return (void*)(_addr - _addr%PAGING_PAGE_SIZE);
   } 
   return addr;
-} 
+}
+
+void* paging_get_physical_address(uint32_t* dir, void* virt) {
+  void* virt_new = paging_align_to_lower_page(virt);
+  void* offset = (void*)((uint32_t)virt - (uint32_t)virt_new);
+  return (void*)((paging_get(dir, virt_new) & 0xfffff000) + offset);
+}

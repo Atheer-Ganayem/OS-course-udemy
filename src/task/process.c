@@ -310,3 +310,48 @@ int process_load_switch(const char* filename, struct process** proc) {
   }
   return res;
 }
+
+void process_get_arguments(struct process* proc, int* argc, char*** argv) {
+  *argc = proc->arguments.argc;
+  *argv = proc->arguments.argv;
+}
+
+int command_count_arguments(struct command_argument* root) {
+  struct command_argument* cur = root;
+  int count = 0;
+
+  while (cur) {
+    count++;
+    cur = cur->next;
+  }
+
+  return count;
+}
+
+int process_inject_arguments(struct process* proc, struct command_argument* root) {
+  struct command_argument* cur = root;
+  int argc = command_count_arguments(root);
+  if (argc == 0) {
+    return -EIO;
+  }
+
+  char** argv = process_malloc(proc, sizeof(const char*) * argc);
+  if (!argv) {
+    return -ENOMEM;
+  }
+
+  for (int i = 0; cur; i++) {
+    char* argument_str = process_malloc(proc, sizeof(cur->argument));
+    if (!argument_str) {
+      return -ENOMEM;
+    }
+    strncpy(argument_str, cur->argument, sizeof(cur->argument));
+    argv[i] = argument_str;
+    cur = cur->next;
+  }
+
+  proc->arguments.argc = argc;
+  proc->arguments.argv = argv;
+
+  return 0;
+}

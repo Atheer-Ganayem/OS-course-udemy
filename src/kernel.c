@@ -137,11 +137,15 @@ void kernel_main() {
   // initializaion finished
 
   struct process* proc = NULL;
-  int res = process_load_switch("0:/shell.elf", &proc);
+  int res = process_load_switch("0:/blank.elf", &proc);
   if (res != PEACHOS_ALL_OK) {
     panic("Failed to load shell.elf\n");
   }
 
+  struct command_argument arg2 = {"arg2", NULL};
+  struct command_argument root = {"arg1", NULL};
+  root.next = &arg2;
+  process_inject_arguments(proc, &root);
   task_run_first_ever_task();
 
   while(1){}

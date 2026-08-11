@@ -53,4 +53,6 @@ void task_current_save_state(struct interupt_frame* frame);
 int copy_string_from_task(struct task* task, void *virt, void* phys, int max);
 void* task_get_stack_item(struct task* task, int index);
 
+void* task_virtual_address_to_physical(struct task* task, void* virt);
+
 #endif

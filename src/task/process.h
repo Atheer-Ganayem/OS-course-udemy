@@ -14,6 +14,16 @@ struct process_allocation {
   size_t size;
 };
 
+struct command_argument {
+  char argument[512];
+  struct command_argument* next;
+};
+
+struct process_arguments {
+  int argc;
+  char** argv;
+};
+
 struct process {
   uint16_t id;
   char filename[PEACHOS_MAX_PATH];
@@ -39,6 +49,8 @@ struct process {
     int tail;
     int head;
   } keyboard;
+
+  struct process_arguments arguments;
 };
 
 struct process* process_current();
@@ -47,5 +59,7 @@ int process_load_switch(const char* filename, struct process** proc);
 int process_switch(struct process* proc);
 void* process_malloc(struct process* proc, size_t size);
 void process_free(struct process* proc, void* ptr);
+void process_get_arguments(struct process* proc, int* argc, char*** argv);
+int process_inject_arguments(struct process* proc, struct command_argument* root);
 
 #endif
