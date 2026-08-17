@@ -26,5 +26,7 @@ int peachos_getkey_block();
 void peachos_terminal_readline(char* out, size_t max, bool output_while_typing);
 void peachos_process_load_start(const char* filename);
 void peachos_process_get_arguments(struct process_arguments* arguments);
+int peachos_system(struct command_argument* args);
+int peachos_system_run(const char* command);
 
 #endif

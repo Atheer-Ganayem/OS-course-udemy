@@ -78,3 +78,15 @@ void peachos_terminal_readline(char* out, size_t max, bool output_while_typing) 
 
   out[i] = 0x00;
 }
+
+int peachos_system_run(const char* command) {
+  char buf[1024];
+  strncpy(buf, command, sizeof(buf));
+  struct command_argument* root_cmd_arg = peachos_parse_command(command, sizeof(buf));
+  if (!root_cmd_arg) {
+    return -1;
+  }
+
+  return peachos_system(root_cmd_arg);
+  
+}
